@@ -1,7 +1,7 @@
 # CryGenerator
 gerador de ransomware
 
-O script fornecido é um gerador de ransomware de demonstração. Ele é projetado para fins educacionais e de aprendizado e não deve ser usado de forma maliciosa ou ilegal.
+O script fornecido é um gerador de ransomware
 
 O funcionamento do script é o seguinte:
 
